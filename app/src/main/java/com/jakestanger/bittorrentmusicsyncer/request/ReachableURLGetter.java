@@ -1,4 +1,4 @@
-package com.jakestanger.bittorrentmusicsyncer.requests;
+package com.jakestanger.bittorrentmusicsyncer.request;
 
 import android.os.AsyncTask;
 
@@ -44,7 +44,7 @@ public class ReachableURLGetter extends AsyncTask<String, Void, String>
 	{
 		try
 		{
-			URL url = new URL(urlPath);
+			URL url = new URL(urlPath + "/test");
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			
 			int code = connection.getResponseCode();

@@ -1,4 +1,4 @@
-package com.jakestanger.bittorrentmusicsyncer.requests;
+package com.jakestanger.bittorrentmusicsyncer.request;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;

@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import com.jakestanger.bittorrentmusicsyncer.requests.RetrieveData;
+import com.jakestanger.bittorrentmusicsyncer.request.RetrieveData;
 import com.jakestanger.bittorrentmusicsyncer.wrapper.JsonData;
 
 import static com.jakestanger.bittorrentmusicsyncer.MainActivity.ARTIST;

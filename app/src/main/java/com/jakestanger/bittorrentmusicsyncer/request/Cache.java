@@ -1,4 +1,4 @@
-package com.jakestanger.bittorrentmusicsyncer.requests;
+package com.jakestanger.bittorrentmusicsyncer.request;
 
 /**
  * @author Jake stanger

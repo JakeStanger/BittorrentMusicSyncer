@@ -1,0 +1,208 @@
+package com.jakestanger.bittorrentmusicsyncer.service;
+
+import android.app.Service;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Binder;
+import android.os.IBinder;
+import android.os.PowerManager;
+import com.jakestanger.bittorrentmusicsyncer.request.Cache;
+import com.jakestanger.bittorrentmusicsyncer.request.ReachableURLGetter;
+import com.jakestanger.bittorrentmusicsyncer.view.MediaControllerView;
+import com.jakestanger.bittorrentmusicsyncer.wrapper.Track;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+
+/**
+ * @author Jake stanger
+ * TODO Write JavaDoc
+ */
+public class MusicService extends Service implements MediaPlayer.OnErrorListener,
+		MediaPlayer.OnCompletionListener, MediaControllerView.MediaPlayerControl
+{
+	private MediaPlayer mediaPlayer;
+	//private MediaControllerView mediaController;
+	
+	private ArrayList<Track> tracks;
+	private int trackIndex;
+	
+	private final IBinder musicBind = new MusicBinder();
+	
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		trackIndex = 0;
+		mediaPlayer = new MediaPlayer();
+		
+		initMusicPlayer();
+	}
+	
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId)
+	{
+		return START_STICKY;
+	}
+	
+	private void initMusicPlayer()
+	{
+		//Avoid playback stopping when device sleeps
+		mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+		
+		//mediaPlayer.setOnPreparedListener(this);
+		mediaPlayer.setOnCompletionListener(this);
+		mediaPlayer.setOnErrorListener(this);
+		
+		//mediaPlayer.prepareAsync();
+	}
+	
+	public void setTracks(ArrayList<Track> tracks)
+	{
+		this.tracks = tracks;
+	}
+	
+	@Override
+	public IBinder onBind(Intent intent)
+	{
+		return musicBind;
+	}
+	
+	@Override
+	public boolean onUnbind(Intent intent)
+	{
+		mediaPlayer.stop();
+		mediaPlayer.release();
+		return false;
+	}
+	
+	public void playTrack(Track track)
+	{
+		try
+		{
+			String[] URLs = {"http://192.168.0.19/", "http://music.jakestanger.com/"}; //TODO integrate into class
+			String baseURL = Cache.getReachableURL() != null ?
+					Cache.getReachableURL() : new ReachableURLGetter().execute(URLs).get();
+			
+			Uri uri = Uri.parse(baseURL + track.getDownloadURL());
+			
+			mediaPlayer.reset();
+			
+			mediaPlayer.setDataSource(this, uri);
+			mediaPlayer.prepareAsync();
+			//mediaPlayer.start();
+		}
+		catch (InterruptedException | ExecutionException | IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public void setTrackIndex(int trackIndex)
+	{
+		this.trackIndex = trackIndex;
+	}
+	
+	public void setTrack(Track track)
+	{
+		ArrayList<Track> tracks = new ArrayList<>();
+		tracks.add(track);
+		this.setTracks(tracks);
+	}
+	
+	@Override
+	public void onCompletion(MediaPlayer mediaPlayer)
+	{
+		stopSelf();
+	}
+	
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		if(mediaPlayer.isPlaying()) mediaPlayer.stop();
+		mediaPlayer.release();
+	}
+	
+	@Override
+	public boolean onError(MediaPlayer mediaPlayer, int i, int i1)
+	{
+		return false;
+	}
+	
+	public MediaPlayer getMediaPlayer()
+	{
+		return mediaPlayer;
+	}
+	
+	public class MusicBinder extends Binder
+	{
+		public MusicService getService()
+		{
+			return MusicService.this;
+		}
+	}
+	
+	//--Media controller--
+	@Override
+	public void start()
+	{
+		mediaPlayer.start();
+	}
+	
+	@Override
+	public void pause()
+	{
+		mediaPlayer.pause();
+	}
+	
+	@Override
+	public int getDuration()
+	{
+		return mediaPlayer.getDuration();
+	}
+	
+	@Override
+	public int getCurrentPosition()
+	{
+		return mediaPlayer.getCurrentPosition();
+	}
+	
+	@Override
+	public void seekTo(int i)
+	{
+		mediaPlayer.seekTo(i);
+	}
+	
+	@Override
+	public boolean isPlaying()
+	{
+		return mediaPlayer.isPlaying();
+	}
+	
+	@Override
+	public int getBufferPercentage()
+	{
+		return 0; //TODO investigate
+	}
+	
+	@Override
+	public boolean canPause()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean canSeekBackward()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean canSeekForward()
+	{
+		return true;
+	}
+}

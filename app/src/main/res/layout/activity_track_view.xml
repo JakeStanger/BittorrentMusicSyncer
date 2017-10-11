@@ -2,17 +2,39 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_track"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jakestanger.bittorrentmusicsyncer.TrackActivity">
+    tools:context="com.jakestanger.bittorrentmusicsyncer.TrackActivity"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/track_view_toolbar"
         layout="@layout/track_view_toolbar"/>
 
-    <ListView
+    <LinearLayout
         android:layout_below="@+id/track_view_toolbar"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/@android:id/list"/>
+        android:layout_above="@+id/media_controller_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/@android:id/list"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/media_controller_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/@android:id/list"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
+
+    </LinearLayout>
+
+
 </RelativeLayout>
