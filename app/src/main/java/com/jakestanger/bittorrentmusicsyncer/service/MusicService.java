@@ -56,6 +56,8 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 		mediaPlayer.setOnCompletionListener(this);
 		mediaPlayer.setOnErrorListener(this);
 		
+		
+		
 		//mediaPlayer.prepareAsync();
 	}
 	
@@ -73,7 +75,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	@Override
 	public boolean onUnbind(Intent intent)
 	{
-		mediaPlayer.stop();
+		//mediaPlayer.stop();
 		mediaPlayer.release();
 		return false;
 	}

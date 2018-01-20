@@ -12,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <service android:name=".service.MusicService" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -34,8 +37,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.jakestanger.bittorrentmusicsyncer.AlbumActivity"/>
         </activity>
-
-        <service android:name=".service.MusicService" />
     </application>
 
 </manifest>

@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import com.jakestanger.bittorrentmusicsyncer.request.GetMagnetURL;
 import com.jakestanger.bittorrentmusicsyncer.request.RetrieveData;
 import com.jakestanger.bittorrentmusicsyncer.service.MusicService;
 import com.jakestanger.bittorrentmusicsyncer.view.MediaControllerView;
@@ -21,13 +22,13 @@ import com.jakestanger.bittorrentmusicsyncer.wrapper.Track;
 
 import java.util.ArrayList;
 
+import static com.jakestanger.bittorrentmusicsyncer.MainActivity.musicBound;
+import static com.jakestanger.bittorrentmusicsyncer.MainActivity.musicService;
+import static com.jakestanger.bittorrentmusicsyncer.MainActivity.playIntent;
 import static com.jakestanger.bittorrentmusicsyncer.wrapper.JsonData.Type.TRACK;
 
 public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener
 {
-	private MusicService musicService;
-	private Intent playIntent;
-	private boolean musicBound;
 	
 	private MediaControllerView mediaController;
 	
@@ -36,6 +37,8 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 	private ArrayList<Track> trackQueue;
 	
 	private boolean firstTap = true;
+	
+	private String artistName, albumName;
 	
 	private ServiceConnection musicConnection = new ServiceConnection() {
 		@Override
@@ -60,6 +63,20 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 	{
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.tracklist_menu, menu);
+		
+		final TrackActivity instance = this;
+		
+		MenuItem menuItem = menu.findItem(R.id.download_album);
+		menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem menuItem)
+			{
+				new GetMagnetURL(instance).getMagnetURL(artistName, albumName);
+				//
+				return true;
+			}
+		});
+		
 		return true;
 	}
 	
@@ -77,10 +94,11 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		
 		final Intent intent = getIntent();
-		final String artistName = intent.getStringExtra(MainActivity.ARTIST);
-		final String albumName = intent.getStringExtra(AlbumActivity.ALBUM);
+		artistName = intent.getStringExtra(MainActivity.ARTIST);
+		albumName = intent.getStringExtra(AlbumActivity.ALBUM);
 		setTitle(albumName);
 		
+		//Setup list
 		ListView listView = (ListView) findViewById(android.R.id.list);
 		
 		final RetrieveData retrieveData = new RetrieveData(this);
@@ -106,6 +124,11 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 			@Override
 			public void hide() {}
 		};
+
+        //Show mediaController if service is already running.
+        if(musicService != null)
+            if(musicService.getMediaPlayer().isPlaying())
+                setupMediaController();
 	}
 	
 	@Override
@@ -115,15 +138,21 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 		
 		if(firstTap)
 		{
-			if(musicBound) //TODO wait for mediaplayer to be ready
+			if(musicBound)
 			{
-				mediaController.setMediaPlayer(musicService);
-				mediaController.setAnchorView((ViewGroup) findViewById(R.id.media_controller_container));
-				mediaController.show();
+				setupMediaController();
 			}
 		}
 		else if (musicBound) mediaController.show(0);
 	}
+
+	private void setupMediaController()
+	{
+		mediaController.setMediaPlayer(musicService);
+		mediaController.setAnchorView((ViewGroup) findViewById(R.id.media_controller_container));
+		mediaController.show();
+	}
+
 	
 	@Override
 	protected void onStart()
@@ -142,22 +171,31 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 	{
 		super.onStop();
 		mediaController.hide();
-		musicService.getMediaPlayer().stop();
-		musicService.getMediaPlayer().release();
-		
-		if(musicBound)
-		{
-			unbindService(musicConnection);
-			musicBound = false;
-		}
+//		if(musicService.getMediaPlayer().isPlaying()) musicService.getMediaPlayer().stop();
+//		musicService.getMediaPlayer().release();
+//
+//		if(musicBound)
+//		{
+//			unbindService(musicConnection);
+//			musicBound = false;
+//		}
 	}
 	
 	@Override
 	protected void onDestroy()
 	{
-		stopService(playIntent);
-		getApplicationContext().unbindService(musicConnection);
-		musicService = null;
+		//stopService(playIntent);
+		//getApplicationContext().unbindService(musicConnection);
+		//musicService = null;
 		super.onDestroy();
+	}
+
+	@Override
+	public void onBackPressed()
+	{
+		//getApplicationContext().unbindService(musicConnection);
+		Intent intent = new Intent(TrackActivity.this, AlbumActivity.class);
+		intent.putExtra(MainActivity.ARTIST, artistName);
+		startActivity(intent);
 	}
 }

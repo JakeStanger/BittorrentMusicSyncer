@@ -32,7 +32,7 @@ public class ReachableURLGetter extends AsyncTask<String, Void, String>
 	private String getFirstReachableURL(String[] URLs)
 	{
 		int i = 0;
-		while(!isReachable(URLs[i])) i++;
+		while(!isReachable(URLs[i]) && i + 1 < URLs.length) i++;
 		return URLs[i];
 	}
 	

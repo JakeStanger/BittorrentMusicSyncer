@@ -12,11 +12,10 @@ public class Track
 	private String key;
 	private String downloadURL;
 	
-	public Track(String title, String titleSort, String summary, String key, String downloadURL)
+	public Track(String title, String titleSort, String key, String downloadURL)
 	{
 		this.title = title;
 		this.titleSort = titleSort;
-		this.summary = summary;
 		this.key = key;
 		this.downloadURL = downloadURL.replace(" ", "%20").replace("'", "%27");
 	}
@@ -39,16 +38,6 @@ public class Track
 	public void setTitleSort(String titleSort)
 	{
 		this.titleSort = titleSort;
-	}
-	
-	public String getSummary()
-	{
-		return summary;
-	}
-	
-	public void setSummary(String summary)
-	{
-		this.summary = summary;
 	}
 	
 	public String getKey()

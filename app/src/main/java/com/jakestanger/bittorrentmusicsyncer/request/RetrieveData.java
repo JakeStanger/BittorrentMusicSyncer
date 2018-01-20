@@ -18,14 +18,14 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
+import static com.android.volley.Request.Method.GET;
+
 /**
  * @author Jake stanger
  * Handles server data retrieval
  */
 public class RetrieveData
 {
-	private static final String[] URLs = {"http://192.168.0.19/", "http://music.jakestanger.com/"};
-	
 	private static RequestQueue queue;
 	
 	private ArrayAdapter adapter;
@@ -40,11 +40,12 @@ public class RetrieveData
 		try
 		{
 			String baseURL = Cache.getReachableURL() != null ?
-					Cache.getReachableURL() : new ReachableURLGetter().execute(URLs).get();
+					Cache.getReachableURL() : new ReachableURLGetter().execute(Cache.URLs).get();
+			
 			String URL = baseURL + "/json?artist=" + URLEncoder.encode(jsonData.getArtistName(), "UTF-8") +
 					"&album=" + URLEncoder.encode(jsonData.getAlbumName(), "UTF-8");
 			
-			StringRequest stringRequest = new StringRequest(Request.Method.GET, URL, new Response.Listener<String>()
+			StringRequest stringRequest = new StringRequest(GET, URL, new Response.Listener<String>()
 			{
 				@Override
 				public void onResponse(String response)
@@ -71,11 +72,10 @@ public class RetrieveData
 								
 								String title = trackData.getString("title");
 								String titleSort = trackData.getString("titleSort");
-								String summary = trackData.getString("summary");
 								String key = trackData.getString("key");
 								String downloadURL = trackData.getString("downloadURL");
 								
-								tracks.add(new Track(title, titleSort, summary, key, downloadURL));
+								tracks.add(new Track(title, titleSort, key, downloadURL));
 							}
 							
 							adapter = new TrackAdapter(context, tracks);
