@@ -67,4 +67,16 @@ public class AlbumActivity extends AppCompatActivity
 		onBackPressed();
 		return true;
 	}
+
+	/**
+	 * Returns to parent screen on back button pressed.
+	 * Without this, the album view returns to the track view,
+	 * whereas the desired effect is to return to the artist view.
+	 */
+	@Override
+	public void onBackPressed()
+	{
+		Intent intent = new Intent(AlbumActivity.this, MainActivity.class);
+		startActivity(intent);
+	}
 }

@@ -15,7 +15,7 @@ import java.util.Locale;
 
 /**
  * @author Jake stanger
- * TODO Write JavaDoc
+ * TODO Write JavaDoc TODO Convert all comments from Rusian
  */
 public class MediaControllerView extends FrameLayout
 {
