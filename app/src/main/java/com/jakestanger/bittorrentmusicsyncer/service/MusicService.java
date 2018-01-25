@@ -1,8 +1,11 @@
 package com.jakestanger.bittorrentmusicsyncer.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -15,6 +18,8 @@ import com.jakestanger.bittorrentmusicsyncer.wrapper.Track;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+
+import static android.media.session.PlaybackState.ACTION_PLAY;
 
 /**
  * @author Jake stanger
@@ -30,6 +35,8 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	private int trackIndex;
 	
 	private final IBinder musicBind = new MusicBinder();
+
+	private MediaSession session;
 	
 	@Override
 	public void onCreate()
@@ -37,6 +44,9 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 		super.onCreate();
 		trackIndex = 0;
 		mediaPlayer = new MediaPlayer();
+
+		session = new MediaSession(this, "MusicService");
+		session.setCallback(new MediaSessionCallback());
 		
 		initMusicPlayer();
 	}

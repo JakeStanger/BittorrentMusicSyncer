@@ -87,7 +87,7 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 		setContentView(R.layout.activity_track_view);
 		
 		//Custom toolbar setup
-		Toolbar toolbar = (Toolbar) findViewById(R.id.track_view_toolbar);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.title_toolbar);
 		setSupportActionBar(toolbar);
 		
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -127,7 +127,7 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 
         //Show mediaController if service is already running.
         if(musicService != null)
-            if(musicService.getMediaPlayer().isPlaying())
+            if(musicService.getMediaPlayer().getTrackInfo() != null)
                 setupMediaController();
 	}
 	

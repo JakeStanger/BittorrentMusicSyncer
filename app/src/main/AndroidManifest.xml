@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
 
     <application
         android:allowBackup="true"
@@ -17,7 +18,7 @@
 
         <activity android:name=".MainActivity"
             android:launchMode="singleTop"
-        >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -27,8 +28,9 @@
         <activity
             android:name=".AlbumActivity"
             android:label="@string/title_activity_album"
+            android:parentActivityName=".MainActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".MainActivity">
+            android:theme="@style/AppTheme.NoActionBar">>
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="com.jakestanger.bittorrentmusicsyncer.MainActivity"/>

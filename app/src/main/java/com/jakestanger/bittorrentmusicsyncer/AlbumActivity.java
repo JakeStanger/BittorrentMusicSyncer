@@ -3,25 +3,38 @@ package com.jakestanger.bittorrentmusicsyncer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.jakestanger.bittorrentmusicsyncer.request.RetrieveData;
+import com.jakestanger.bittorrentmusicsyncer.view.MediaControllerView;
 import com.jakestanger.bittorrentmusicsyncer.wrapper.JsonData;
 
 import static com.jakestanger.bittorrentmusicsyncer.MainActivity.ARTIST;
+import static com.jakestanger.bittorrentmusicsyncer.MainActivity.musicService;
 
 public class AlbumActivity extends AppCompatActivity
 {
 	static final String ALBUM = "com.jakestanger.bittorentmusicsyncer.ALBUM";
 	
 	private String name;
+
+	private MediaControllerView mediaController;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_album_view);
+
+		//Custom toolbar setup
+		Toolbar toolbar = (Toolbar) findViewById(R.id.title_toolbar);
+		setSupportActionBar(toolbar);
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		
 		Intent intent = getIntent();
 		
@@ -44,6 +57,23 @@ public class AlbumActivity extends AppCompatActivity
 				showAlbum(name, entry);
 			}
 		});
+
+		mediaController = new MediaControllerView(this) {
+			@Override
+			public void hide() {}
+		};
+
+		//Show mediaController if service is already running.
+		if(musicService != null && musicService.getMediaPlayer() != null)
+			if(musicService.getMediaPlayer().getTrackInfo() != null)
+				setupMediaController();
+	}
+
+	private void setupMediaController()
+	{
+		mediaController.setMediaPlayer(musicService);
+		mediaController.setAnchorView((ViewGroup) findViewById(R.id.media_controller_container));
+		mediaController.show();
 	}
 	
 	@Override

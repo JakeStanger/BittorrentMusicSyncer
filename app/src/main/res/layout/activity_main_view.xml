@@ -2,15 +2,14 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_album"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jakestanger.bittorrentmusicsyncer.AlbumActivity"
+    tools:context="com.jakestanger.bittorrentmusicsyncer.MainActivity"
     android:orientation="vertical">
 
     <include
-        android:id="@+id/title_toolbar"
-        layout="@layout/title_toolbar"/>
+            android:id="@+id/title_toolbar"
+            layout="@layout/title_toolbar"/>
 
     <LinearLayout
         android:layout_below="@+id/title_toolbar"
@@ -33,6 +32,5 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:orientation="horizontal">
-
     </LinearLayout>
 </RelativeLayout>

@@ -1,35 +1,41 @@
 package com.jakestanger.bittorrentmusicsyncer;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.jakestanger.bittorrentmusicsyncer.request.Cache;
-import com.jakestanger.bittorrentmusicsyncer.request.GetMagnet;
 import com.jakestanger.bittorrentmusicsyncer.request.RetrieveData;
 import com.jakestanger.bittorrentmusicsyncer.service.MusicService;
+import com.jakestanger.bittorrentmusicsyncer.view.MediaControllerView;
 import com.jakestanger.bittorrentmusicsyncer.wrapper.JsonData;
 
 public class MainActivity extends AppCompatActivity
 {
 	static final String ARTIST = "com.jakestanger.bittorentmusicsyncer.ARTIST";
 
-	public static MusicService musicService;
-	public static Intent playIntent;
-	public static boolean musicBound;
+	static MusicService musicService;
+	static Intent playIntent;
+	static boolean musicBound;
+
+	private MediaControllerView mediaController;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_main_view);
+
+		//Custom toolbar setup
+		Toolbar toolbar = (Toolbar) findViewById(R.id.title_toolbar);
+		setSupportActionBar(toolbar);
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		
 		ListView listView = (ListView) findViewById(android.R.id.list);
 		
@@ -44,6 +50,16 @@ public class MainActivity extends AppCompatActivity
 				showArtist(entry);
 			}
 		});
+
+		mediaController = new MediaControllerView(this) {
+			@Override
+			public void hide() {}
+		};
+
+		//Show mediaController if service is already running.
+		if(musicService != null && musicService.getMediaPlayer() != null)
+			if(musicService.getMediaPlayer().getTrackInfo() != null )
+				setupMediaController();
 		
 		Cache.setAppDir(this.getApplicationContext().getFilesDir());
 		
@@ -55,6 +71,13 @@ public class MainActivity extends AppCompatActivity
 		{
 			throwable.printStackTrace();
 		}
+	}
+
+	private void setupMediaController()
+	{
+		mediaController.setMediaPlayer(musicService);
+		mediaController.setAnchorView((ViewGroup) findViewById(R.id.media_controller_container));
+		mediaController.show();
 	}
 	
 	private void showArtist(String artist)

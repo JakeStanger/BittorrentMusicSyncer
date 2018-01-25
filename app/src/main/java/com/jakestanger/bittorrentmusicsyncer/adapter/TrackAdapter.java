@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /**
  * @author Jake stanger
- * Custom track adapter
+ * Custom array adapter
  * for passing Track object
  */
 public class TrackAdapter extends ArrayAdapter<Track>
