@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class FetchMagnet extends AsyncTask<String, Void, List<Byte>>
 {
-	byte[] data;
+	private byte[] data;
 	
 	@Override
 	protected List<Byte> doInBackground(String... strings)

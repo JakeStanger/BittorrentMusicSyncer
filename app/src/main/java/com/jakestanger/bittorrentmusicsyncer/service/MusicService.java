@@ -1,9 +1,8 @@
 package com.jakestanger.bittorrentmusicsyncer.service;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.net.Uri;
@@ -18,8 +17,6 @@ import com.jakestanger.bittorrentmusicsyncer.wrapper.Track;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-
-import static android.media.session.PlaybackState.ACTION_PLAY;
 
 /**
  * @author Jake stanger
@@ -36,16 +33,14 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	
 	private final IBinder musicBind = new MusicBinder();
 
-	private MediaSession session;
-	
-	@Override
+    @Override
 	public void onCreate()
 	{
 		super.onCreate();
 		trackIndex = 0;
 		mediaPlayer = new MediaPlayer();
 
-		session = new MediaSession(this, "MusicService");
+        MediaSession session = new MediaSession(this, "MusicService");
 		session.setCallback(new MediaSessionCallback());
 		
 		initMusicPlayer();
@@ -101,15 +96,26 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 			Uri uri = Uri.parse(baseURL + track.getDownloadURL());
 			
 			mediaPlayer.reset();
+
+			AudioAttributes.Builder attributes = new AudioAttributes.Builder();
+			attributes.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC);
+			attributes.setUsage(AudioAttributes.USAGE_MEDIA);
 			
 			mediaPlayer.setDataSource(this, uri);
+			mediaPlayer.setAudioAttributes(attributes.build());
 			mediaPlayer.prepareAsync();
+			//mediaPlayer.seekTo(0);
 			//mediaPlayer.start();
 		}
 		catch (InterruptedException | ExecutionException | IOException e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void playQueue()
+	{
+		playTrack(tracks.get(trackIndex));
 	}
 	
 	public void setTrackIndex(int trackIndex)
@@ -127,7 +133,12 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	@Override
 	public void onCompletion(MediaPlayer mediaPlayer)
 	{
-		stopSelf();
+		if(trackIndex < tracks.size() - 1 && getCurrentPosition() > getDuration() / 2)
+		{
+			trackIndex++;
+			playTrack(tracks.get(trackIndex));
+		}
+		else stopSelf();
 	}
 	
 	@Override
@@ -173,7 +184,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	@Override
 	public int getDuration()
 	{
-		return mediaPlayer.getDuration();
+		return mediaPlayer.isPlaying() ? mediaPlayer.getDuration() : 0;
 	}
 	
 	@Override
@@ -207,14 +218,35 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 	}
 	
 	@Override
-	public boolean canSeekBackward()
+	public boolean canSkipBackward()
 	{
-		return true;
+		return trackIndex - 1 > 0;
 	}
 	
 	@Override
-	public boolean canSeekForward()
+	public boolean canSkipForward()
 	{
-		return true;
+		return trackIndex < tracks.size() - 1;
+	}
+
+	@Override
+	public void nextTrack()
+	{
+		System.out.println("DFKLNH");
+		if(canSkipForward())
+		{
+			trackIndex++;
+			playTrack(tracks.get(trackIndex));
+		}
+	}
+
+	@Override
+	public void previousTrack()
+	{
+		if(canSkipBackward())
+		{
+			trackIndex--;
+			playTrack(tracks.get(trackIndex));
+		}
 	}
 }

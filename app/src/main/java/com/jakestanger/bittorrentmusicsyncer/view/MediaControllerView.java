@@ -180,10 +180,10 @@ public class MediaControllerView extends FrameLayout
 			if (mPauseButton != null && !mPlayer.canPause()) {
 				mPauseButton.setEnabled(false);
 			}
-			if (mRewButton != null && !mPlayer.canSeekBackward()) {
+			if (mRewButton != null && !mPlayer.canSkipBackward()) {
 				mRewButton.setEnabled(false);
 			}
-			if (mFfwdButton != null && !mPlayer.canSeekForward()) {
+			if (mFfwdButton != null && !mPlayer.canSkipForward()) {
 				mFfwdButton.setEnabled(false);
 			}
 		} catch (IncompatibleClassChangeError ex) {
@@ -441,11 +441,13 @@ public class MediaControllerView extends FrameLayout
 			if (mPlayer == null) {
 				return;
 			}
-			
-			int pos = mPlayer.getCurrentPosition();
-			pos -= 5000; // милисекунд
-			mPlayer.seekTo(pos);
-			setProgress();
+//
+//			int pos = mPlayer.getCurrentPosition();
+//			pos -= 5000; // милисекунд
+//			mPlayer.seekTo(pos);
+//			setProgress();
+
+			mPlayer.previousTrack();
 			
 			show(sDefaultTimeout);
 		}
@@ -457,10 +459,12 @@ public class MediaControllerView extends FrameLayout
 				return;
 			}
 			
-			int pos = mPlayer.getCurrentPosition();
-			pos += 15000; // милисекунд
-			mPlayer.seekTo(pos);
-			setProgress();
+//			int pos = mPlayer.getCurrentPosition();
+//			pos += 15000; // милисекунд
+//			mPlayer.seekTo(pos);
+//			setProgress();
+
+			mPlayer.nextTrack();
 			
 			show(sDefaultTimeout);
 		}
@@ -504,8 +508,10 @@ public class MediaControllerView extends FrameLayout
 		boolean isPlaying();
 		int     getBufferPercentage();
 		boolean canPause();
-		boolean canSeekBackward();
-		boolean canSeekForward();
+		boolean canSkipBackward();
+		boolean canSkipForward();
+		void nextTrack();
+		void previousTrack();
 	}
 	
 	private static class MessageHandler extends Handler

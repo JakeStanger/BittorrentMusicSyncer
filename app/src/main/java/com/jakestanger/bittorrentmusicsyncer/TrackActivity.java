@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.*;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import com.jakestanger.bittorrentmusicsyncer.request.GetMagnetURL;
@@ -35,6 +36,7 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 	private Handler handler = new Handler();
 	
 	private ArrayList<Track> trackQueue;
+	private int queueIndex;
 	
 	private boolean firstTap = true;
 	
@@ -105,18 +107,28 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 		retrieveData.showData(new JsonData(artistName, albumName, TRACK), listView, this);
 		
 		final TrackActivity instance = this;
+
+		trackQueue = new ArrayList<>();
 		
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int pos, long id)
 			{
+				queueIndex = pos;
+
+				Adapter adapter = parent.getAdapter();
+				for(int i = 0; i < adapter.getCount(); i++)
+					trackQueue.add((Track) adapter.getItem(i));
+
 				musicService.startService(playIntent);
 				
 				musicService.getMediaPlayer().setOnPreparedListener(instance);
 				
-				Track track = (Track) parent.getAdapter().getItem(pos);
-				musicService.setTrack(track);
-				musicService.playTrack(track);
+				Track track = trackQueue.get(queueIndex);
+				musicService.setTracks(trackQueue);
+				//musicService.playTrack(track);
+				musicService.setTrackIndex(queueIndex);
+				musicService.playQueue();
 			}
 		});
 		
@@ -134,6 +146,7 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 	@Override
 	public void onPrepared(MediaPlayer mediaPlayer)
 	{
+		mediaPlayer.seekTo(0);
 		mediaPlayer.start();
 		
 		if(firstTap)
@@ -145,6 +158,8 @@ public class TrackActivity extends AppCompatActivity implements MediaPlayer.OnPr
 		}
 		else if (musicBound) mediaController.show(0);
 	}
+
+
 
 	private void setupMediaController()
 	{
